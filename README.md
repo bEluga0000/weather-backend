@@ -10,11 +10,11 @@ A simple weather app that provides real-time weather updates and forecasts by ci
 ## Installation
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Rutuja1923/weather-app.git
+   git clone https://github.com/Rutuja1923/Weather-App.git
    ```
 2. Navigate to the project directory:
    ```bash
-   cd weather-app
+   cd Weather-App
    ```
 
 ## Usage
