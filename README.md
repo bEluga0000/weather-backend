@@ -1,7 +1,4 @@
-Here's a brief `README.md` code for your weather app:
-
-```markdown
-# Weather App
+# WeatherPulse 
 
 A simple weather app that provides real-time weather updates and forecasts by city name.
 
@@ -28,5 +25,5 @@ A simple weather app that provides real-time weather updates and forecasts by ci
 - HTML
 - CSS
 - JavaScript
-```
+
 
