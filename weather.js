@@ -16,22 +16,14 @@ const PORT = 3000;
 //route to handle API calls
 app.get('/weather', async (req, res) => {
     const apiKey = process.env.API_KEY;
-    //console.log(apiKey);
     const city = req.query.city;
-    //console.log(city);
-
-    //url to get geocode data for a city - longitude and latitude
-    const geoCodeURL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`;
+    const apiBase = "https://api.openweathermap.org/data/2.5/";
 
     try{
-        //fetch geocode data to get latitude and longitude
-        const geoResponse = await axios.get(geoCodeURL);
-        const { lon, lat } = geoResponse.data.coord;
-
-        //fetch current weather and forecast using the coordinates
+        //fetch current weather and forecast using the cityname
         const [currentWeatherResponse, forecastResponse] = await Promise.all([
-            axios.get(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}`),
-            axios.get(`https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}`)
+            axios.get(`${apiBase}weather?q=${city}&unit=metric&appid=${apiKey}`),
+            axios.get(`${apiBase}forecast?q=${city}&unit=metric&appid=${apiKey}`)
         ]);
 
         //combining responses
