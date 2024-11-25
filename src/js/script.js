@@ -20,15 +20,15 @@ cityInputForm.addEventListener('submit', async function(event){
     event.preventDefault();
     
     const cityName = document.getElementById('cityInput').value.trim();
-    console.log(cityName);
+    //console.log(cityName);
 
     const weatherData = await  getWeatherData(cityName);
-    console.log(weatherData);
+    //console.log(weatherData);
     
     displayWeather(weatherData);
 
 });
 
-function displayWeather(){
+function displayWeather(weatherData){
     
 }
