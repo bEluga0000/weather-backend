@@ -1,0 +1,24 @@
+.current-weather {
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(250, 249, 248, 0.15);
+    width: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 20px auto; 
+    padding: 10px 20px;
+}
+.temperature-div,
+.other-info {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 5px;
+}
+.current-weather p {
+    padding: 0px;
+    margin: 0px;
+}
