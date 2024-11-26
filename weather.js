@@ -22,8 +22,8 @@ app.get('/weather', async (req, res) => {
     try{
         //fetch current weather and forecast using the cityname
         const [currentWeatherResponse, forecastResponse] = await Promise.all([
-            axios.get(`${apiBase}weather?q=${city}&unit=metric&appid=${apiKey}`),
-            axios.get(`${apiBase}forecast?q=${city}&unit=metric&appid=${apiKey}`)
+            axios.get(`${apiBase}weather?q=${city}&units=metric&appid=${apiKey}`),
+            axios.get(`${apiBase}forecast?q=${city}&units=metric&appid=${apiKey}`)
         ]);
 
         //combining responses
