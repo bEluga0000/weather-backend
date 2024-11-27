@@ -58,13 +58,13 @@ function displayWeather(weatherData){
     //temperature details
     const tempDiv = document.createElement('div');
     tempDiv.classList.add('temp-div');
-    tempDiv.innerHTML=`<p>${currentWeatherRes.main.temp}°C</p><p>${currentWeatherRes.weather[0].main}</p>`;
+    tempDiv.innerHTML=`<p>${currentWeatherRes.main.temp} °C</p><p>${currentWeatherRes.weather[0].main}</p>`;
     temperatureDiv.appendChild(tempDiv);
 
     //description details
     const weatherDesc = document.createElement('div');
     weatherDesc.classList.add('desc-div');
-    weatherDesc.innerHTML=`<p>${currentWeatherRes.weather[0].description}</p><p>Feels Like ${currentWeatherRes.main.feels_like}°C</p>`;
+    weatherDesc.innerHTML=`<p>${currentWeatherRes.weather[0].description}</p><p>Feels Like ${currentWeatherRes.main.feels_like} °C</p>`;
     temperatureDiv.appendChild(weatherDesc);
 
     currentWeatherDiv.appendChild(temperatureDiv);
@@ -82,7 +82,7 @@ function displayWeather(weatherData){
     otherInfoDiv.appendChild(humidity);
 
     const visibility = document.createElement('div');
-    visibility.innerHTML = `<p>Visibility</p><p>${currentWeatherRes.visibility} m</p>`;
+    visibility.innerHTML = `<p>Visibility</p><p>${(currentWeatherRes.visibility/1000).toFixed(2)} km</p>`;
     otherInfoDiv.appendChild(visibility);
 
     const windSpeed = document.createElement('div');
@@ -97,10 +97,20 @@ function displayForecast(weatherData){
     let forecastRes = weatherData.forecast;
     let forecastList = forecastRes.list;
 
+    //getting the bundled arrays for each day
+    const bundledArray = getBundledData(forecastList);
+    console.log(bundledArray);
+
+    //getting the days in the format Tues, 26 Nov
+    const daysWithNames = getNextFiveDaysWithNames(); 
+
     //get the forecast div
     const weatherForecastDiv = document.querySelector('.weather-forecast');
     weatherForecastDiv.innerHTML = '';
     weatherForecastDiv.style.display = 'block';
+
+    //get the hourly forecast-div
+    const mainDiv = document.querySelector('.hourly-forecast');
 
     //div for storing 5 days weather ( not in detail)
     const fiveDaysDiv = document.createElement('div');
@@ -126,7 +136,7 @@ function displayForecast(weatherData){
                                 <img src="https://openweathermap.org/img/wn/${fiveDaysData[0].weather[0].icon}.png" alt="Weather Icon">
                                 </div>
                                 <div id='div2'>
-                                <p>${fiveDaysData[0].main.temp}°C</p>
+                                <p>${fiveDaysData[0].main.temp} °C</p>
                                 <p>${fiveDaysData[0].weather[0].main}</p>
                                 </div>
                                 `;
@@ -149,12 +159,11 @@ function displayForecast(weatherData){
             laterToday.textContent = originalText;
         });
         laterToday.addEventListener('click', ()=>{
-            showHourlyWeather(fiveDaysData[0].dt_txt);
+            showHourlyWeather(bundledArray[0] , daysWithNames[0] , mainDiv);
         });
     }
     fiveDaysDiv.appendChild(nextWeatherDiv);
-    //getting the days in the format Tues, 26 Nov
-    const daysWithNames = getNextFiveDaysWithNames(); 
+
 
     //creating remaining divs for forecast data
     for (let i=1; i<5 ; i++) {
@@ -183,7 +192,7 @@ function displayForecast(weatherData){
                 datePara.textContent = originalText;
             });
             datePara.addEventListener('click', () => {
-                showHourlyWeather(fiveDaysData[i].dt_txt);
+                showHourlyWeather(bundledArray[i], daysWithNames[i] , mainDiv);
             });
         }
         fiveDaysDiv.appendChild(nextDaysDiv);
@@ -191,9 +200,88 @@ function displayForecast(weatherData){
     weatherForecastDiv.appendChild(fiveDaysDiv);
 }
 
-const showHourlyWeather= (firstHourTime) => {
-    const currHour = firstHourTime;
-    console.log(`getting hourly data , ${currHour}`);
+const showHourlyWeather= (bundle , day , mainDiv) => {
+    mainDiv.innerHTML = '';
+    mainDiv.style.display = 'block';
+
+    const subDiv = document.createElement('div');
+    subDiv.classList.add('sub-div');
+
+    //adding functionality to close the hourly div
+    const hidePara = document.createElement('p');
+    hidePara.classList.add('hide-div');
+    hidePara.innerHTML = `<span><i class="fa fa-close"></i></span>`;
+    
+    //adding functionality to hide the cross button
+    hidePara.querySelector('span').addEventListener('click',()=>{
+        mainDiv.style.display='none';
+    })
+    mainDiv.appendChild(hidePara);
+
+    //adding date
+    const dayDate = document.createElement('p');
+    dayDate.classList.add('day-date');
+    dayDate.innerText = `${day}`;
+    mainDiv.appendChild(dayDate);
+
+    //getting divs for each data from bundle array
+    bundle.forEach(data => {
+
+        const hourDiv = document.createElement('div');
+        hourDiv.classList.add('hour-div');
+        
+        const time = document.createElement('p');
+        time.innerText = `${convertTimestamp(data.dt_txt)}`;
+        hourDiv.appendChild(time);
+
+        const iconImg = document.createElement('img');
+        iconImg.src=`https://openweathermap.org/img/wn/${data.weather[0].icon}.png`;
+        iconImg.alt=`${data.weather[0].main}-weather-icon`;
+        hourDiv.appendChild(iconImg);
+
+        const div1 = document.createElement('div');
+        div1.classList.add('divOne');
+
+        const temp = document.createElement('p');
+        temp.innerText = `${data.main.temp} °C`;
+        div1.appendChild(temp);
+
+        const weatherTitle = document.createElement('p');
+        weatherTitle.innerText = `${data.weather[0].main}`
+        div1.appendChild(weatherTitle);
+
+        hourDiv.appendChild(div1);
+
+        const div2 = document.createElement('div');
+        div2.classList.add('divTwo');
+
+        const press = document.createElement('p');
+        press.innerText = `${data.main.pressure} hPa`
+        div2.appendChild(press);
+
+        const humdt = document.createElement('p');
+        humdt.innerText = `${data.main.humidity} %`
+        div2.appendChild(humdt);
+
+        hourDiv.appendChild(div2);
+
+        const div3 = document.createElement('div');
+        div3.classList.add('divThree');
+
+        const windSpd= document.createElement('p');
+        windSpd.innerText = `${data.wind.speed} m/s`
+        div3.appendChild(windSpd);
+
+        const vsblty = document.createElement('p');
+        vsblty.innerText = `${(data.visibility/1000).toFixed(2)} km`
+        div3.appendChild(vsblty);
+
+        hourDiv.appendChild(div3);
+
+        subDiv.appendChild(hourDiv);
+    });
+
+    mainDiv.appendChild(subDiv);
 }
 
 //utility functions
@@ -242,5 +330,40 @@ const getNextFiveDaysWithNames = () => {
     return days;
 };
 
-  
+const getBundledData = (forecastList) => {
+    const bundles = []; 
+    let currentBundle = [];
+
+    forecastList.forEach((data) => {
+        currentBundle.push(data);
+
+        if (data.dt_txt.endsWith("21:00:00")) {
+            bundles.push([...currentBundle]);
+            currentBundle = [];
+        }
+    });
+
+    if (currentBundle.length > 0) {
+        bundles.push(currentBundle);
+    }
+
+    return bundles;
+}
+
+const convertTimestamp = (timestamp) => {
+    const [date, time] = timestamp.split(" ");
+    const [hour, minute] = time.split(":");
+    const hourInt = parseInt(hour, 10);
+    const period = hourInt >= 12 ? "PM" : "AM";
+    let adjustedHour = hourInt % 12 || 12;
+
+    if (hourInt === 0) {
+        adjustedHour = 0;
+    }
+
+    let formattedTime = `${adjustedHour.toString().padStart(2, '0')}:${minute} ${period}`;
+
+    return formattedTime;
+}
+
   
