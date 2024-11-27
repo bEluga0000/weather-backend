@@ -44,6 +44,8 @@ app.get('/weather', async (req, res) => {
 });
 
 //start the server
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-});
+// app.listen(PORT, () => {
+//     console.log(`Server running on http://localhost:${PORT}`);
+// });
+module.exports = app;
+module.exports.handler = require("@vercel/node").createServer(app);
