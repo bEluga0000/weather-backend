@@ -91,35 +91,10 @@ button:hover {
 }
 
 header h1,
-header p{
+header p {
     margin: 5px auto;
 }
 
-footer p{
+footer p {
     margin: 2px auto;
 }
-
-/*.info-tooltip .tooltip-text {
-
-  display: none;
-
-  position: absolute;
-
-  background-color: #fff;
-
-  border: 1px solid #ccc;
-
-  padding: 5px;
-
-  z-index: 1;
-
-}
-
-
-
-.info-tooltip:hover .tooltip-text {
-
-  display: block;
-
-}
-*/
