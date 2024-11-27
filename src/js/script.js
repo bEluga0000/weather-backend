@@ -130,27 +130,74 @@ function displayForecast(weatherData){
                                 <p>${fiveDaysData[0].weather[0].main}</p>
                                 </div>
                                 `;
+    //code to diplay today's hourly forecast
+    const divOne = nextWeatherDiv.querySelector('#div1');
+    if (divOne){
+        const laterToday = divOne.querySelector('p'); 
+        const originalText = laterToday.textContent;
+        laterToday.addEventListener('mouseenter',() => {
+            laterToday.style.textDecoration = 'underline';
+            const moreIcon = document.createElement('span');
+            moreIcon.id = 'more-icon';
+            moreIcon.innerHTML = '<i class="fa fa-arrow-circle-right"></i>';
+            const combinedText = originalText +' '+ moreIcon.outerHTML;
+            laterToday.innerHTML = combinedText;
+        });
+        
+        laterToday.addEventListener('mouseleave',() => {
+            laterToday.style.textDecoration = 'none';
+            laterToday.textContent = originalText;
+        });
+        laterToday.addEventListener('click', ()=>{
+            showHourlyWeather(fiveDaysData[0].dt_txt);
+        });
+    }
     fiveDaysDiv.appendChild(nextWeatherDiv);
-
     //getting the days in the format Tues, 26 Nov
     const daysWithNames = getNextFiveDaysWithNames(); 
-    i=1;
 
     //creating remaining divs for forecast data
-    for (i=1; i<5 ; i++) {
+    for (let i=1; i<5 ; i++) {
         const nextDaysDiv = document.createElement('div');
         nextDaysDiv.classList.add('next-day-div');
         nextDaysDiv.innerHTML=`<p>${daysWithNames[i]}</p>
                                <img src="https://openweathermap.org/img/wn/${fiveDaysData[i].weather[0].icon}.png" alt="Weather Icon">
                                <p>${fiveDaysData[i].main.temp}°C</p>
-                               <p>${fiveDaysData[i].weather[0].main}</p>`;
+                               <p>${fiveDaysData[i].weather[0].main}</p>
+                               `;
+        //code to display hourly weather forecast
+        let datePara = nextDaysDiv.querySelector('p');
+        datePara.classList.add('date-para');
+        if (datePara) {
+            const originalText = datePara.textContent;
+            datePara.addEventListener('mouseenter',() => {
+                datePara.style.textDecoration = 'underline';
+                const moreIcon = document.createElement('span');
+                moreIcon.id = 'more-icon';
+                moreIcon.innerHTML = '<i class="fa fa-arrow-circle-right"></i>';
+                const combinedText = originalText +' '+ moreIcon.outerHTML;
+                datePara.innerHTML = combinedText;
+            });
+            datePara.addEventListener('mouseleave',() => {
+                datePara.style.textDecoration = 'none';
+                datePara.textContent = originalText;
+            });
+            datePara.addEventListener('click', () => {
+                showHourlyWeather(fiveDaysData[i].dt_txt);
+            });
+        }
         fiveDaysDiv.appendChild(nextDaysDiv);
     }
-
     weatherForecastDiv.appendChild(fiveDaysDiv);
 }
 
-function getCurrentTime(){
+const showHourlyWeather= (firstHourTime) => {
+    const currHour = firstHourTime;
+    console.log(`getting hourly data , ${currHour}`);
+}
+
+//utility functions
+const getCurrentTime = () => {
     const now = new Date();
     const year = now.getFullYear();
     const month = now.getMonth() + 1;
@@ -189,7 +236,7 @@ const getNextFiveDaysWithNames = () => {
         const dayName = dayNames[currentDate.getDay()]; 
         const date = currentDate.getDate(); 
         const monthName = monthNames[currentDate.getMonth()];
-        days.push(`${dayName}, ${date} ${monthName}`);
+        days.push(`${dayName} ${date} ${monthName}`);
     }
 
     return days;
