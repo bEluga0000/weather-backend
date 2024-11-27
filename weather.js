@@ -36,6 +36,9 @@ app.get('/weather', async (req, res) => {
     } 
     catch (error) {
         console.error('Error fetching data:', error);
+        if (error.response && error.response.status === 404) {
+            return res.status(404).json({ error: 'City not found' });
+        }
         res.status(500).json({ error: 'Failed to fetch weather data' });
     }
 });
