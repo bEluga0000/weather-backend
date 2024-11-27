@@ -1,31 +1,47 @@
 async function getWeatherData(city){
-    try{
-        //getting the data from the server-side endpoint
-        const response = await fetch(`http://localhost:3000/weather?city=${city}`);
-      
-        if (!response.ok){
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        return data;
-    } 
-    catch (error){
-        console.error('Error fetching weather data:', error);
+    //getting the data from the server-side endpoint
+    const response = await fetch(`http://localhost:3000/weather?city=${city}`);
+    if (response.status === 404) {
+        return { error: 'City not found' };
     }
+    if (!response.ok) {
+        return { error: 'Network error occurred' };
+    }
+    const data = await response.json();
+    return data;
 }
 
 const cityInputForm = document.getElementById('weatherForm');
 cityInputForm.addEventListener('submit', async function(event){
-
     event.preventDefault();
-    
     const cityName = document.getElementById('cityInput').value.trim();
+    const result = document.querySelector('.current-weather');
+    result.style.display = 'block';
 
-    const weatherData = await  getWeatherData(cityName);
+    if (!cityName){
+        result.innerHTML = 'Please Enter City Name ...';
+        document.querySelector('.weather-forecast').style.display = 'none';
+        document.querySelector('.hourly-forecast').style.display = 'none';
+        return;
+    }
+    try{
+        const weatherData = await  getWeatherData(cityName);
     
-    displayWeather(weatherData);
-    displayForecast(weatherData);
-
+        if (weatherData.error){
+            result.innerHTML = weatherData.error ;
+            document.getElementById('cityInput').value = "";
+            document.querySelector('.weather-forecast').style.display = 'none';
+            document.querySelector('.hourly-forecast').style.display = 'none';
+            return ;
+        }
+        result.innerHTML = 'Loading...';
+        displayWeather(weatherData);
+        displayForecast(weatherData);
+    }
+    catch (err){
+        console.error('Unexpected error:', err);
+        resultElement.innerHTML = 'An unexpected error occurred.';
+    }
 });
 
 function displayWeather(weatherData){
@@ -39,10 +55,10 @@ function displayWeather(weatherData){
     let currentWeatherRes = weatherData.currentWeather ;
 
     //city name , country code , Date 
-    const current = getCurrentTime();
+    const current = getNextFiveDaysWithNames();
     const cityDiv = document.createElement('div');
     cityDiv.classList.add('city-div');
-    cityDiv.innerHTML = `<p>${currentWeatherRes.name} , ${currentWeatherRes.sys.country} <span id='today-date'>${current.date}</span></p>`;
+    cityDiv.innerHTML = `<p>${currentWeatherRes.name} , ${currentWeatherRes.sys.country}</p><p id='today-date'>${current[0]}</p>`;
     currentWeatherDiv.appendChild(cityDiv);
 
     //temperature and weather description details
@@ -58,13 +74,13 @@ function displayWeather(weatherData){
     //temperature details
     const tempDiv = document.createElement('div');
     tempDiv.classList.add('temp-div');
-    tempDiv.innerHTML=`<p>${currentWeatherRes.main.temp} °C</p><p>${currentWeatherRes.weather[0].main}</p>`;
+    tempDiv.innerHTML=`<p id='temp'>${currentWeatherRes.main.temp} °C</p><p>${currentWeatherRes.weather[0].main}</p>`;
     temperatureDiv.appendChild(tempDiv);
 
     //description details
     const weatherDesc = document.createElement('div');
     weatherDesc.classList.add('desc-div');
-    weatherDesc.innerHTML=`<p>${currentWeatherRes.weather[0].description}</p><p>Feels Like ${currentWeatherRes.main.feels_like} °C</p>`;
+    weatherDesc.innerHTML=`<p id='desc'>${capitalize(currentWeatherRes.weather[0].description)}</p><p>Feels Like ${currentWeatherRes.main.feels_like} °C</p>`;
     temperatureDiv.appendChild(weatherDesc);
 
     currentWeatherDiv.appendChild(temperatureDiv);
@@ -74,43 +90,44 @@ function displayWeather(weatherData){
     otherInfoDiv.classList.add('other-info');
 
     const pressure = document.createElement('div');
-    pressure.innerHTML = `<p>Pressure</p><p>${currentWeatherRes.main.pressure} hPa</p>`;
+    pressure.innerHTML = `<p class='info-titles'>Pressure</p><p>${currentWeatherRes.main.pressure} hPa</p>`;
     otherInfoDiv.appendChild(pressure);
 
     const humidity = document.createElement('div');
-    humidity.innerHTML = `<p>Humidity</p><p>${currentWeatherRes.main.humidity} %</p>`;
+    humidity.innerHTML = `<p class='info-titles'>Humidity</p><p>${currentWeatherRes.main.humidity} %</p>`;
     otherInfoDiv.appendChild(humidity);
 
     const visibility = document.createElement('div');
-    visibility.innerHTML = `<p>Visibility</p><p>${(currentWeatherRes.visibility/1000).toFixed(2)} km</p>`;
+    visibility.innerHTML = `<p class='info-titles'>Visibility</p><p>${(currentWeatherRes.visibility/1000).toFixed(2)} km</p>`;
     otherInfoDiv.appendChild(visibility);
 
     const windSpeed = document.createElement('div');
-    windSpeed.innerHTML = `<p>Wind Speed</p><p>${currentWeatherRes.wind.speed} m/s</p>`;
+    windSpeed.innerHTML = `<p class='info-titles'>Wind Speed</p><p>${currentWeatherRes.wind.speed} m/s</p>`;
     otherInfoDiv.appendChild(windSpeed);
 
     currentWeatherDiv.appendChild(otherInfoDiv);
 }
 
 function displayForecast(weatherData){
+    //get the forecast div
+    const weatherForecastDiv = document.querySelector('.weather-forecast');
+    weatherForecastDiv.innerHTML = '';
+
+    //get the hourly forecast-div
+    const mainDiv = document.querySelector('.hourly-forecast');
+    mainDiv.innerHTML = '';
+
+    weatherForecastDiv.style.display = 'block';
+
     //get the forecast result and get the list of weather details
     let forecastRes = weatherData.forecast;
     let forecastList = forecastRes.list;
 
     //getting the bundled arrays for each day
     const bundledArray = getBundledData(forecastList);
-    console.log(bundledArray);
 
     //getting the days in the format Tues, 26 Nov
     const daysWithNames = getNextFiveDaysWithNames(); 
-
-    //get the forecast div
-    const weatherForecastDiv = document.querySelector('.weather-forecast');
-    weatherForecastDiv.innerHTML = '';
-    weatherForecastDiv.style.display = 'block';
-
-    //get the hourly forecast-div
-    const mainDiv = document.querySelector('.hourly-forecast');
 
     //div for storing 5 days weather ( not in detail)
     const fiveDaysDiv = document.createElement('div');
@@ -163,7 +180,6 @@ function displayForecast(weatherData){
         });
     }
     fiveDaysDiv.appendChild(nextWeatherDiv);
-
 
     //creating remaining divs for forecast data
     for (let i=1; i<5 ; i++) {
@@ -285,6 +301,15 @@ const showHourlyWeather= (bundle , day , mainDiv) => {
 }
 
 //utility functions
+
+const capitalize = (str) => {
+    if (typeof str !== 'string' || str.length === 0) {
+      return str;
+    }
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+
 const getCurrentTime = () => {
     const now = new Date();
     const year = now.getFullYear();
