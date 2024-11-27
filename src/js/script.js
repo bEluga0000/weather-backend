@@ -24,6 +24,9 @@ cityInputForm.addEventListener('submit', async function(event){
         document.querySelector('.hourly-forecast').style.display = 'none';
         return;
     }
+    
+    result.innerHTML = 'Loading...';
+
     try{
         const weatherData = await  getWeatherData(cityName);
     
@@ -34,13 +37,12 @@ cityInputForm.addEventListener('submit', async function(event){
             document.querySelector('.hourly-forecast').style.display = 'none';
             return ;
         }
-        result.innerHTML = 'Loading...';
         displayWeather(weatherData);
         displayForecast(weatherData);
     }
     catch (err){
         console.error('Unexpected error:', err);
-        resultElement.innerHTML = 'An unexpected error occurred.';
+        result.innerHTML = 'An unexpected error occurred.';
     }
 });
 
