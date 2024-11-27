@@ -1,0 +1,70 @@
+.hourly-forecast {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(250, 249, 248, 0.15);
+    margin: 20px auto;
+    padding: 10px 20px;
+}
+.hourly-forecast > p{
+    text-align: center;
+}
+.sub-div {
+    display: flex;
+    flex-direction: row;
+    gap:10px;
+    align-items: center;
+    justify-content: space-around;
+}
+.hour-div {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 8px;
+}
+.hour-div img {
+    height: 40px;
+    width: 40px;
+    margin: 0px auto;
+}
+.hour-div p {
+    margin: 2px;
+    text-align: center;
+}
+.divOne,
+.divTwo,
+.divThree {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-around;
+    font-size: small;
+    gap:10px;
+}
+
+.hide-div {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0px;
+    margin: 0px;   
+}
+
+.hide-div span {
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px;
+    border-radius: 50%;
+    font-size: small;
+    width: 10px;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.hide-div span:hover{
+    background-color: rgba(243, 18, 18,0.6);
+}
